@@ -37,9 +37,17 @@ app.get('/records', (req, res) => {
 });
 
 app.post('/records', (req, res) => {
+    const idGenerator = () => {
+        return Math.floor(Math.random() * 1_000_000_000)
+    }
     const data = readExcelData();
     const newRecord = req.body;
-    data.push(newRecord);
+    const currentID = idGenerator()
+    const existIDs = data.map((e, i) => e.id)    
+    if (existIDs.includes(currentID)) {
+        currentID = idGenerator()
+    }
+    data.push({ ...newRecord, id: currentID });
     writeExcelData(data);
     res.status(201).json({ message: 'Record added successfully!', record: newRecord });
 });
